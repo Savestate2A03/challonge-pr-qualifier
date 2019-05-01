@@ -1,7 +1,13 @@
 import challonge
 import xlwt
 
-challonge.set_credentials("Savestate", "YOUR API KEY HERE")
+config = {}
+with open("qualifier.cfg") as config_file:
+    for line in config_file:
+        key, val = line.partition("=")[::2]
+        config[key.strip()] = val.strip()
+
+challonge.set_credentials("Savestate", config["challonge_api_key"])
 
 ########################################
 
