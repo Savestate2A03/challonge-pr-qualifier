@@ -56,7 +56,9 @@ not_in_region = [
 	"Willy P",
 	"Rob Rowe",
 	"Dagoth Dev",
-	"Prince Ryuta"
+	"Prince Ryuta",
+	"Ender",
+	"Charlie Nash"
 ]
 
 ########################################
@@ -89,6 +91,50 @@ def add_to_dict(player, players, aliases):
 			"ids": [player["id"]],
 			"qualified": qualified
 		}
+
+def final_calculations(players, players_keys, ws, check=None):
+	style_lose   = xlwt.easyxf('font: color-index red')
+	style_win    = xlwt.easyxf('font: color-index green')
+	style_header = xlwt.easyxf('font: bold on, height 160')
+
+	r = 1
+	c = 1
+	max_row = 1
+
+	for key in players_keys:
+		player = players[key]
+		print(f"{key}")
+		ws.write(r, c, key)
+		base_row = r
+		for tourney in player["sets"]:
+			if len(player["sets"][tourney]) == 0:
+				continue
+			c += 1
+			r = base_row
+			fail_all_checks = True
+			ws.write(r, c, tourney, style_header)
+			print(f"  {tourney}")
+			for s in player["sets"][tourney]:
+				if check is not None:
+					if not check(s):
+						continue
+				fail_all_checks = False
+				r += 1
+				if key == s["winner"]:
+					print(f"    WIN vs {s['loser']}")
+					ws.write(r, c, f"WIN vs {s['loser']}", style_win)
+				else:
+					print(f"    LOSE vs {s['winner']}")
+					ws.write(r, c, f"LOSE vs {s['winner']}", style_lose)
+				if (r > max_row):
+					max_row = r
+			if(fail_all_checks):
+				ws
+				ws.write(r, c, "", style_header)
+				c -= 1
+		c = 1
+		r = max_row + 2
+
 
 match_cache = {}
 tourney_cache = {}
@@ -138,7 +184,7 @@ for tourney_id in match_cache:
 
 # remove players who don't qualify
 players_keys = list(players.keys())
-threshold = 3
+threshold = 2
 for player in players_keys:
 	if len(players[player]["tournaments"]) < threshold:
 		print(f"Removing {player} (< {threshold}) ...")
@@ -157,39 +203,17 @@ print(", ".join(players_keys))
 print(":: QUALIFYING PLAYER RESULTS ::")
 
 wb = xlwt.Workbook()
-ws = wb.add_sheet("Player Stats")
+ws_ps = wb.add_sheet("Player Stats")
+ws_qo = wb.add_sheet("Qualified Only", cell_overwrite_ok=True)
 
-r = 1
-c = 1
-max_row = 1
+def qualified_only(s):
+	if(s["winner"] not in players_keys):
+		return False
+	if(s["loser"] not in players_keys):
+		return False 
+	return True
 
-style_lose   = xlwt.easyxf('font: color-index red')
-style_win    = xlwt.easyxf('font: color-index green')
-style_header = xlwt.easyxf('font: bold on')
-
-for key in players_keys:
-	player = players[key]
-	print(f"{key}")
-	ws.write(r, c, key)
-	base_row = r
-	for tourney in player["sets"]:
-		if len(player["sets"][tourney]) == 0:
-			continue
-		c += 1
-		r = base_row
-		ws.write(r, c, tourney, style_header)
-		print(f"  {tourney}")
-		for s in player["sets"][tourney]:
-			r += 1
-			if key == s["winner"]:
-				print(f"    WIN vs {s['loser']}")
-				ws.write(r, c, f"WIN vs {s['loser']}", style_win)
-			else:
-				print(f"    LOSE vs {s['winner']}")
-				ws.write(r, c, f"LOSE vs {s['winner']}", style_lose)
-			if (r > max_row):
-				max_row = r
-	c = 1
-	r = max_row + 2
+final_calculations(players, players_keys, ws_ps)
+final_calculations(players, players_keys, ws_qo, check=qualified_only)
 
 wb.save('player_info.xls')
