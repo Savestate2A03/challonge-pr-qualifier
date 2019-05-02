@@ -35,7 +35,8 @@ aliases = {
 	"Vulfaerix": ["Vulf"],
 	"Prince Ryuta": ["Ryuta"],
 	"FacebookJoe": ["FBJoe"],
-	"Johnny": ["LOVE", "Rotunda"]
+	"Johnny": ["LOVE", "Rotunda"],
+	"Ogre": ["True Ogre"]
 }
 
 not_in_region = [
@@ -58,7 +59,8 @@ not_in_region = [
 	"Dagoth Dev",
 	"Prince Ryuta",
 	"Ender",
-	"Charlie Nash"
+	"Charlie Nash",
+	"Sulla"
 ]
 
 ########################################
