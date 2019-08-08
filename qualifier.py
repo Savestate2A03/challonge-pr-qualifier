@@ -1,5 +1,6 @@
 import challonge
 import xlwt
+from pprint import pprint
 
 config = {}
 with open("qualifier.cfg") as config_file:
@@ -12,31 +13,77 @@ challonge.set_credentials("Savestate", config["challonge_api_key"])
 ########################################
 
 brackets = [
-	"FellaFridays01_25Dubs",
-	"FellaFridays02_01Singles",
-	"FellaFridays02_08_19Singles",
-	"FellaFridays02_15Singles",
-	"FellaFridays02_22_19SIngles",
-	"FellaFridays03_01_19Singles",
-	"FellaFridays03_15_19Singles",
-	"FellaFridays03_22_19Singles",
-	"FellaFridays03_29_19",
-	"FellaFridays04_05_19Singles",
-	"FellaFridays04_12_19Singles",
-	"FellaFridays04_26_19Singles"
+	"d1r1rp2y",
+	"lr9mh0gi",
+	"pje7gfye",
+	"ss81bl3k",
+	"544x8v28",
+	"MMS19",
+	"triadtrilogy1",
+	"triadtrilogy2",
+	"triadtrilogy3"
+]
+
+previous_pr = [
+	"Zasa",
+	"Lamb",
+	"Saef",
+	"Savestate",
+	"Afrodad",
+	"Marklar",
+	"Giraffe",
+	"Legrats",
+	"Subie"
 ]
 
 aliases = {
 	"Robert": ["Rob"],
-	"SlipnSlide": ["Slip"],
+	"Chi": ["chi"],
+	"SlipnSlide": ["Slip", "slipnslide"],
 	"Kackame": ["Peyton"],
 	"Duk": ["DukDota", "Hassel"],
 	"Timebones": ["RCS|Timebones"],
 	"Vulfaerix": ["Vulf"],
 	"Prince Ryuta": ["Ryuta"],
-	"FacebookJoe": ["FBJoe"],
+	"FacebookJoe": ["FBJoe", "facebookjoe"],
 	"Johnny": ["LOVE", "Rotunda"],
-	"Ogre": ["True Ogre"]
+	"Ogre": ["True Ogre"],
+	"Redman": ["Locke"],
+	"TwistyTreats": ["Twisty"],
+	"Lambardi": ["lamb"],
+	"Lautrec": ["lautrec"],
+	"Saef": ["saef"],
+	"Subie": ["subie"],
+	"IHOP | Dan": ["ihop dan"],
+	"Adonis": ["adonis"],
+	"BU$TA": ["busta"],
+	"HiFi": ["hifi"],
+	"Sky": ["sky"],
+	"Act": ["act"],
+	"Andy": ["andy"],
+	"Angel": ["angel"],
+	"Coconut Man": ["Coconut Man"],
+	"EMB": ["emb"],
+	"Grit": ["grit"],
+	"Exposed": ["exposed"],
+	"Willy P": ["willypee", "WillyP"],
+	"Hennessy": ["hennessy"],
+	"Krillin": ["Krillin the Villain", "KrillintheVillian"],
+	"MountainDrew": ["mountaindrew"],
+	"Music": ["music"],
+	"Obscurity": ["obscurity"],
+	"Orcus": ["orcus"],
+	"Choi": ["choi"],
+	"Osmics": ["osmics"],
+	"Paradigm": ["paradigm"],
+	"Siddward": ["siddward"],
+	"YV": ["yv"],
+	"GCS": ["gcs"],
+	"Harrison": ["kid fantastic"],
+	"Afrodad": ["afrodad"],
+	"Pelipper": ["pelipper"],
+	"Shenal": ["$henal"],
+	"Subie": ["$ubie"]
 }
 
 not_in_region = [
@@ -60,7 +107,32 @@ not_in_region = [
 	"Prince Ryuta",
 	"Ender",
 	"Charlie Nash",
-	"Sulla"
+	"Sulla",
+	"Chi",
+	"Choi",
+	"GCS",
+	"IHOP | Dan",
+	"jwilli",
+	"MEAT",
+	"Tiger",
+	"TwistyTreats",
+	"Adonis",
+	"Babich",
+	"HiFi",
+	"Jonathan Cotto",
+	"Act",
+	"Grit",
+	"Andy",
+	"Coconut Man",
+	"Exposed",
+	"Willy P",
+	"Hennessy",	
+	"muffinman",
+	"Obscurity",
+	"MountainDrew",
+	"Osmics",
+	"Paradigm",
+	"YV"
 ]
 
 ########################################
@@ -93,6 +165,13 @@ def add_to_dict(player, players, aliases):
 			"ids": [player["id"]],
 			"qualified": qualified
 		}
+
+def check_if_beaten_pr(player, previous_pr):
+	for tourney in player["sets"].keys():
+		for result in player["sets"][tourney]:
+			if result["loser"].lower() in [x.lower() for x in previous_pr]:
+				return True
+	return False
 
 def final_calculations(players, players_keys, ws, check=None):
 	style_lose   = xlwt.easyxf('font: color-index red')
@@ -184,10 +263,16 @@ for tourney_id in match_cache:
 				if match["id"] not in [x["id"] for x in players[player]["sets"][tourney]]:
 					players[player]["sets"][tourney].append(match_details)
 
+
 # remove players who don't qualify
 players_keys = list(players.keys())
 threshold = 2
 for player in players_keys:
+	if not players[player]["qualified"]:
+		players[player]["qualified"] = check_if_beaten_pr(players[player], previous_pr)
+		if players[player]["qualified"]:
+			print(f"{player} beat PR last season ...")
+	# ---
 	if len(players[player]["tournaments"]) < threshold:
 		print(f"Removing {player} (< {threshold}) ...")
 		players.pop(player)
