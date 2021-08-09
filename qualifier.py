@@ -1,6 +1,9 @@
 import challonge
 import xlwt
-from pprint import pprint
+import pprint
+import requests
+
+pp = pprint.PrettyPrinter(indent=4)
 
 config = {}
 with open("qualifier.cfg") as config_file:
@@ -13,168 +16,233 @@ challonge.set_credentials("Savestate", config["challonge_api_key"])
 ########################################
 
 brackets = [
-    "MystiksMansion1",
-    "w7rsagyh",
-    "sgcnhto3",
-    "1l5rrznq",
-    "FellaFridays09_06_19Singles",
-    "1nv7x0rc",
-    "FellaFridays09_20_19Singles",
-    "FellaFridays09_27_19",
-    "FellaFridays10_4_19Singles",
-    "FellaFridays10_18_19Singles",
-    "FellaFridays10_25_19Singles",
-    "FellaFridays11_1_19Singles",
-    "FellaFridays118",
-    "FellaFridays11_15_19Singles",
-    "FellaFridays11_22_19",
-    "Rite1PoolA",
-    "Rite1PoolB",
-    "Rite2"
-    ]
 
-previous_pr = [
-    "Saef",
-    "Afrodad",
-    "Savestate",
-    "Legrats",
-    "BU$TA",
-    "Lambardi",
-    "Subie",
-    "Harrison",
-    "$$$$"
-    "Lautrec"
 ]
 
+# Spille Noen
+for x in range(104, 163+1):
+    bracket_id = "nordicmeleenetplay-SN" + str(x)
+    brackets.append(bracket_id)
+
+# NL Netplay Weekly
+for x in range(87, 153+1):
+    bracket_id = "nlnetplay" + str(x)
+    brackets.append(bracket_id)
+
+# Long Live Netplay UK Weekly
+#for x in range(113, 124+1):
+for x in range(113, 178+1):
+    bracket_id = "LLN" + str(x)
+    brackets.append(bracket_id)
+
+bracket_list = [
+    # SU Smash Tournaments
+    "susmash-ubocfu01",
+    "susmash-sthlmnetplaytwo",
+    "susmash-bz1c6ac6",
+    "susmash-zr20nln8",
+    "susmash-2jddw6et",
+    "susmash-p4iyt7jc",
+    "susmash-1yp52v99",
+    "susmash-1g3bxew",
+    "susmash-s64c0fwg",
+    "susmash-tyly6n61",
+    "susmash-5gtnam55",
+    "susmash-mtor0ko1",
+    "susmash-t6e9srzh",
+    "susmash-4rpzds0m",
+    "susmash-wzafmfng",
+    "susmash-l24ae2d6",
+    "susmash-rlye0tyz",
+    "susmash-26ee3eh4",
+    "susmash-gye1vkwq",
+    "susmash-lfygseml",
+    "susmash-2wo094y5",
+    "susmash-svosyaw5",
+    "susmash-53qxmfam",
+    "susmash-n6cd3zoc",
+    "susmash-v4smwcab",
+    "susmash-is43i9cn",
+    "susmash-4e2yi8tj",
+    "susmash-6qvd3qjo",
+    # EU League
+    "euleague1",
+    "euleague2",
+    "euleague3",
+    "91ihxk2b",
+    "avcbl4cp",
+    # Keanu Reads
+    "yek94it0",
+    # VFGC Weekly
+    "VFGCSSBM2",
+    "VFGCNETPLAY3",
+    "VFGCNETPLAY4",
+    "VFGCNETPLAY5",
+    "VFGCNETPLAY6",
+    "VFGCMELEE7",
+    "VFGCMELEE8",
+    "VFGCmelee9",
+    "VFGCMELEETEN",
+    "xt84mr93",
+    "TTTbecoming16",
+    "Vfgcmelee13",
+    "vfgcmelee14",
+    "vfgcmelee15",
+    "Vfgcmelee16",
+    "VFGCMelee17",
+    "Vfgcmelee18",
+    "Vfgcmelee19",
+    "Vfgcmelee20",
+    "Vfgcmelee21",
+    "Vfgcmelee22",
+    "Vfgcmelee23",
+    "Vfgcmelee24",
+    "Vfgcmelee25",
+    "Vfgcmelee26",
+    "Vfgcmelee27",
+    "VFGCmelee28",
+    "VFGCmelee29",
+    "VFGCMelee30",
+    "VFGCMelee31",
+    "lvpws454",
+    "6yxfk04t",
+    # Skaraborg tournaments
+    "ics029r8",
+    "rda9d1lv",
+    "q5sg07w0",
+    # Italian weeklies
+    "WINT127",
+    "WINT128",
+]
+
+brackets = brackets + bracket_list
+
+# previous_pr = [
+#     "Saef",
+#     "Afrodad",
+#     "Savestate",
+#     "Legrats",
+#     "BU$TA",
+#     "Lambardi",
+#     "Subie",
+#     "Harrison",
+#     "$$$$"
+#     "Lautrec"
+# ]
+
 aliases = {
-    "Robert": ["Rob"],
-    "Chi": ["chi"],
-    "SlipnSlide": ["Slip", "slipnslide"],
-    "Kackame": ["Peyton"],
-    "Duk": ["DukDota", "Hassel"],
-    "Timebones": ["RCS|Timebones"],
-    "Vulfaerix": ["Vulf"],
-    "Prince Ryuta": ["Ryuta"],
-    "FacebookJoe": ["FBJoe", "facebookjoe", "fb joe", "FacebookJoe (3-2 vs ADMJ)"],
-    "Johnny": ["LOVE", "Rotunda"],
-    "Ogre": ["True Ogre"],
-    "Redman": ["Locke"],
-    "TwistyTreats": ["Twisty"],
-    "Lambardi": ["lamb"],
-    "Lautrec": ["lautrec"],
-    "Saef": ["saef", "Saef*", "(put a marble on my coffin)"],
-    "Subie": ["subie"],
-    "IHOP | Dan": ["ihop dan"],
-    "Adonis": ["adonis"],
-    "BU$TA": ["busta"],
-    "HiFi": ["hifi"],
-    "Sky": ["sky"],
-    "Act": ["act"],
-    "Andy": ["andy"],
-    "Angel": ["angel"],
-    "Coconut Man": ["Coconut Man"],
-    "EMB": ["emb"],
-    "Grit": ["grit"],
-    "Exposed": ["exposed"],
-    "Willy P": ["willypee", "WillyP"],
-    "Hennessy": ["hennessy"],
-    "TheArq": ["arq", "Krillin", "krillin the villian", "Krillin the Villain", "KrillintheVillian"],
-    "MountainDrew": ["mountaindrew"],
-    "Music": ["music"],
-    "Obscurity": ["obscurity"],
-    "Orcus": ["orcus"],
-    "Choi": ["choi"],
-    "Osmics": ["osmics"],
-    "Paradigm": ["paradigm"],
-    "Siddward": ["siddward"],
-    "YV": ["yv"],
-    "GCS": ["gcs"],
-    "Harrison": ["kid fantastic", "plug named david :)"],
-    "Afrodad": ["afrodad"],
-    "Pelipper": ["pelipper"],
-    "Shenal": ["$henal"],
-    "Subie": ["$ubie"],
-    "Dev": ["Dagoth Dev"],
-    "Hollow": ["hollow"],
-    "Legrats": ["legrats"],
-    "Magnus": ["Magnus*"],
-    "Mystik": ["mystik", "mystic"],
-    "One Approved": ["one approved", "oneapproved"],
-    "PapaSquat": ["poppasquat"],
-    "Sarge": ["sarge"],
     "Savestate": ["savestate", "RCS|Savestate"],
-    "Shenal": ["shenal", "shenal*"],
-    "Subie": ["subie"]
+    "leffen": ["leffen", "l3ff3n"],
+    "pipsqueak": ["pipsqueak", "blipsqueak"],
+    "meady": ["meady", "meeady"],
+    "redblaze": ["redblaze", "redssbm"],
+    "daydee": ["daydee", "daydee"],
+    "johnnyfight": ["johnnyfight", "johnnyfight"],
+    "humpe": ["humpe", "humpe"],
+    "sharp": ["sharp", "SharpSSBM"],
+    "poppmaister6000": ["poppmaister6000", "poppmaister6000"],
+    "eekim": ["eekim", "eekim_is_you"],
+    "savestate": ["savestate", "savestate"],
+    "gr4pe": ["gr4pe", "gr4pe"],
+    "abbearv": ["abbearv", "abbearv"],
+    "calle w": ["calle w", "calle_w"],
+    "random-ness": ["random-ness", "random_ness"],
+    "lillbaskern": ["lillbaskern", "lillbaskern"],
+    "impx": ["impx", "impx"],
+    "tellman": ["tellman", "dc_tellman"],
+    "jormis": ["jormis", "jormis"],
+    "jerk": ["jerk", "absurd_jerk"],
+    "bigm": ["bigm", "bigmblip", "User83259", ],
+    "abbson": ["abbson", "abbson"],
+    "lamp": ["lamp", "lampoo", "lamp_"],
+    "luigo": ["luigo", "600luigo"],
+    "nils": ["nils", "nilsssbm"],
+    "fatnomen": ["fatnomen", "fatnomen"],
+    "smushmarth": ["smushmarth", "smushmarth"],
+    "peanutz996": ["peanutz996", "peanutz996"],
+    "muren": ["muren", "muren"],
+    "ba$$": ["ba$$", "ba2dollarsigns"],
+    "k1kk0": ["k1kk0", "k1kk0m4n"],
+    "rev": ["rev", "rev"],
+    "ludderix": ["ludderix", "ludderix"],
+    "zedy": ["zedy", "zedylawl"],
+    "sprak": ["sprak", "srpak"],
+    "zing": ["zing", "zing"],
+    "saftblandarn": ["saftblandarn", "saftblandarn"],
+    "barba": ["barba", "niño_vfgc"],
+    "nisse757": ["nisse757", "nisse757"],
+    "dennis": ["dennis", "bigdenni"]
 }
 
-not_in_region = [
-    "The Baberman",
-    "Tucker",
-    "SlipnSlide",
-    "Kackame",
-    "Duk",
-    "Robert",
-    "Timebones",
-    "ZENT",
-    "Roma",
-    "blue53",
-    "Dash",
-    "Vulfaerix",
-    "Regi",
-    "Beeftip",
-    "Prometheus",
-    "Pelipper",
-    "Willy P",
-    "Rob Rowe",
-    "Dagoth Dev",
-    "Prince Ryuta",
-    "Ender",
-    "Charlie Nash",
-    "Sulla",
-    "Chi",
-    "GCS",
-    "IHOP | Dan",
-    "jwilli",
-    "MEAT",
-    "Tiger",
-    "TwistyTreats",
-    "Adonis",
-    "Babich",
-    "HiFi",
-    "Jonathan Cotto",
-    "Grit",
-    "Andy",
-    "Coconut Man",
-    "Exposed",
-    "Willy P",
-    "Hennessy", 
-    "muffinman",
-    "Obscurity",
-    "MountainDrew",
-    "Osmics",
-    "Paradigm",
-    "YV",
-    "Lambardi",
-    "Bongo Beat",
-    "Corolla",
-    "Dev"
+# not_in_region = [
+#     "The Baberman",
+#     "Tucker",
+# ]
+
+
+in_region = [
+    "Savestate",
+    "leffen",
+    "pipsqueak",
+    "meady",
+    "redblaze",
+    "daydee",
+    "johnnyfight",
+    "humpe",
+    "sharp",
+    "poppmaister6000",
+    "eekim",
+    "savestate",
+    "gr4pe",
+    "abbearv",
+    "calle w" ,
+    "random-ness",
+    "lillbaskern",
+    "impx",
+    "tellman",
+    "jormis",
+    "jerk",
+    "bigm",
+    "abbson",
+    "lamp",
+    "luigo",
+    "nils",
+    "fatnomen",
+    "smushmarth",
+    "peanutz996",
+    "muren",
+    "ba$$",
+    "k1kk0",
+    "rev",
+    "ludderix",
+    "zedy",
+    "sprak",
+    "zing",
+    "saftblandarn",
+    "barba",
+    "nisse757",
+    "dennis",
 ]
 
 ########################################
 
 def add_to_dict(player, players, aliases):
-    name = player["name"]   
+    name = player["username"] 
+    if name == None:
+        name = player["name"]
 
-    try:
-        qualified = (player["final_rank"] <= 8)
-    except:
-        qualified = True # there's not an easy
+    #try:
+    #    qualified = (player["final_rank"] <= 8)
+    #except:
+    #    qualified = True # there's not an easy
                          # way to do this unfortunately
+    qualified = True
 
     for key in aliases:
         if name.lower() in [x.lower() for x in aliases[key]]:
             print(f"  Alias {name} -> {key}")
             name = key
+
 
     for key in players:
         if name.lower() == key.lower():
@@ -240,11 +308,62 @@ def final_calculations(players, players_keys, ws, check=None):
                 if (r > max_row):
                     max_row = r
             if(fail_all_checks):
-                ws
                 ws.write(r, c, "", style_header)
                 c -= 1
         c = 1
         r = max_row + 2
+
+def generate_grid_h2h(players, player_keys, ws, check=None):
+    style_lose   = xlwt.easyxf('font: bold on, color-index black; pattern: pattern solid, fore_colour rose')
+    style_win    = xlwt.easyxf('font: bold on, color-index black; pattern: pattern solid, fore_colour light_green ')
+    style_header = xlwt.easyxf('font: bold on, height 160')
+
+    print(f"!- !!!!!! GENERATING h2h GRID !!!!!! -!")
+
+    # reference by player_key
+    player_stats = {}
+
+    # populate qualified players with empty dicts
+    # fill them with all other players to make a grid
+    for primary_player in players_keys:
+        player_stats[primary_player] = {}
+        for vs_player in players_keys:
+            stats = {
+                "wins": 0,
+                "losses": 0,
+            }
+            player = players[primary_player]
+            for tourney in player["sets"]:
+                for s in player["sets"][tourney]:
+                    if (s['loser'] == vs_player) or (s['winner'] == vs_player):
+                        if primary_player == s["winner"]:
+                            stats["wins"] += 1
+                        else:
+                            stats["losses"] += 1
+            player_stats[primary_player][vs_player] = stats
+
+
+    # print names to ws
+    i = 2
+    ws.write(1, 1, "Player", style_header)
+    for player in players_keys:
+        j = 2
+        ws.write(1, i, player, style_header)
+        ws.write(i, 1, player, style_header)
+        for vs_player in players_keys:
+            if vs_player == player:
+                j += 1
+                continue
+            wins = player_stats[player][vs_player]["wins"]
+            losses = player_stats[player][vs_player]["losses"]
+            if wins > losses:
+                ws.write(i, j, f"{wins}-{losses}", style_win)
+            elif wins < losses:
+                ws.write(i, j, f"{wins}-{losses}", style_lose)
+            j += 1
+        i += 1
+
+
 
 
 match_cache = {}
@@ -253,16 +372,76 @@ participant_cache = {}
 
 players = {}
 
+failed_brackets = []
+
 for bracket in brackets:
 
-    tournament = challonge.tournaments.show(bracket)
+    try:
+        tournament = challonge.tournaments.show(bracket)
+    except:
+        failed_brackets.append(bracket)
+        continue
+
     t_id = tournament["id"]
 
-    participants = challonge.participants.index(t_id)
+    try:
+        participants = challonge.participants.index(t_id)
+    except:
+        failed_brackets.append(bracket)
+        continue
 
     print("Tournament: " + tournament["name"])
 
-    match_cache[t_id]       = challonge.matches.index(tournament["id"])
+    try:
+        match_cache[t_id] = challonge.matches.index(tournament["id"])
+    except:
+        failed_brackets.append(bracket)
+        continue
+
+    tourney_cache[t_id]     = tournament
+    participant_cache[t_id] = participants
+
+    for participant in participants:
+        add_to_dict(participant, players, aliases)
+
+# failed 
+
+for bracket in failed_brackets:
+
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        r = requests.get("https://challonge.com/" + bracket, headers=headers)
+        tournament_id = r.headers["X-Challonge-Cache-ID"].replace("tournament-", "")
+    except Exception as e:
+        print(e)
+        print("UNABLE TO GET WEBPAGE " + bracket)
+        continue
+
+    try:
+        tournament = challonge.tournaments.show(tournament_id)
+    except Exception as e:
+        print(e)
+        print("FAILED BRACKET gettournament" + bracket)
+        continue
+
+    t_id = tournament["id"]
+
+    try:
+        participants = challonge.participants.index(t_id)
+    except Exception as e:
+        print(e)
+        print("FAILED BRACKET getparticipants " + bracket)
+        continue
+
+    print("Tournament: " + tournament["name"])
+
+    try:
+        match_cache[t_id] = challonge.matches.index(tournament["id"])
+    except Exception as e:
+        print(e)
+        print("FAILED BRACKET getmatches " + bracket)
+        continue
+
     tourney_cache[t_id]     = tournament
     participant_cache[t_id] = participants
 
@@ -296,7 +475,7 @@ for tourney_id in match_cache:
 
 # remove players who don't qualify
 players_keys = list(players.keys())
-threshold = 2
+threshold = 0
 for player in players_keys:
     if not players[player]["qualified"]:
         players[player]["qualified"] = check_if_beaten_pr(players[player], player, previous_pr)
@@ -309,7 +488,7 @@ for player in players_keys:
     elif not players[player]["qualified"]:
         print(f"Removing {player} (unqualified) ...")
         players.pop(player)
-    elif player.lower() in [x.lower() for x in not_in_region]:
+    elif player.lower() not in [x.lower() for x in in_region]:
         print(f"Removing {player} (rejected) ...")
         players.pop(player)
 
@@ -322,6 +501,7 @@ print(":: QUALIFYING PLAYER RESULTS ::")
 wb = xlwt.Workbook()
 ws_ps = wb.add_sheet("Player Stats")
 ws_qo = wb.add_sheet("Qualified Only", cell_overwrite_ok=True)
+ws_h2h = wb.add_sheet("H2H Grid", cell_overwrite_ok=True)
 
 def qualified_only(s):
     if(s["winner"] not in players_keys):
@@ -332,5 +512,6 @@ def qualified_only(s):
 
 final_calculations(players, players_keys, ws_ps)
 final_calculations(players, players_keys, ws_qo, check=qualified_only)
+generate_grid_h2h(players, players_keys, ws_h2h, check=qualified_only)
 
 wb.save('player_info.xls')
