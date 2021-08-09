@@ -5,5 +5,5 @@ tested on python 3.7.2
 
 prerequisites
 ```
-pip install pychallonge xlwt
+pip install pychallonge xlwt requests
 ```
